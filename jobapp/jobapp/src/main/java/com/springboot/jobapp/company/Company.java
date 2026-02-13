@@ -2,7 +2,9 @@ package com.springboot.jobapp.company;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.springboot.jobapp.job.Job;
+import com.springboot.jobapp.review.Review;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,11 +21,13 @@ public class Company {
     private String name;
     private String description;
 
-    @OneToMany
+    @JsonIgnore
+    @OneToMany(mappedBy = "company")
     private List<Job> jobs;
 
-    //  private List<Review> reviews;
-    
+    @OneToMany
+    @JsonIgnore
+    private List<Review> reviews;
 
     public Company(Long id, String name, String description) {
         this.id = id;
@@ -66,5 +70,4 @@ public class Company {
         this.jobs = jobs;
     }
 
-    
 }

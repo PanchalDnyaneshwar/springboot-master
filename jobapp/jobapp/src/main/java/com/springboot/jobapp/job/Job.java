@@ -1,9 +1,12 @@
 package com.springboot.jobapp.job;
 
+import com.springboot.jobapp.company.Company;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Job {
@@ -17,6 +20,10 @@ public class Job {
     private  Double maxSalary;
     private String location;
 
+    @ManyToOne
+    private Company company;
+
+
         public Job(String title, Long id, String description, double minSalary, double maxSalary, String location) {
         this.title = title;
         this.id = id;
@@ -29,6 +36,14 @@ public class Job {
     public Job() {
     }
 
+        public Company getCompany() {
+        return company;
+    }
+
+    public void setCompany(Company company) {
+        this.company = company;
+    }
+    
     public Long getId() {
         return id;
     }
