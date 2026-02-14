@@ -1,69 +1,88 @@
 package com.springboot.jobapp.review;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
+
+import com.springboot.jobapp.company.Company;
+import com.springboot.jobapp.company.CompanyService;
 
 @Service
 public class ReviewService {
 
-    private ReviewRepository reviewRepository;
+    private final ReviewRepository reviewRepository;
+    private final CompanyService companyService;
 
-    public ReviewService( ReviewRepository reviewRepository) {
+    public ReviewService(ReviewRepository reviewRepository, CompanyService companyService) {
         this.reviewRepository = reviewRepository;
+        this.companyService = companyService;
     }
 
-    public List<Review> getAllReview() throws Exception {
-      try {
-            return this.reviewRepository.findAll();
-      } catch (Exception e) {
-        throw new Exception(e);
-      }
+    public List<Review> getAllReviews(Long companyId) {
+        List<Review> reviews = this.reviewRepository.findByCompanyId(companyId);
+        return reviews;
     }
 
-    public void createReview(Review review) throws Exception {
-       try {
-            this.reviewRepository.save(review);
-       } catch (Exception e) {
-            throw new Exception(e);
-       }
-    }
-
-    public Review getReview(Long id) throws Exception {
-       try {
-            Optional<Review> reOptional =  this.reviewRepository.findById(id);
-            return reOptional.get();
-       } catch (Exception e) {
-            throw new Exception(e);
-       }
-    }
-
-    public void updateReview(Long id, Review review) throws Exception{
-      try {
-            Optional<Review> optional = this.reviewRepository.findById(id);
-            if (optional.isPresent()) {
-                Review review2 = optional.get();
-
-                review2.setCompany(review.getCompany());
-                review2.setRating(review.getRating());
-                review2.setReview(review.getReview());
-
-                this.reviewRepository.save(review2);
-            }
-      } catch (Exception e) {
-         throw new Exception(e);
-      }
-    }
-
-    public void deleteReview(Long id) throws Exception {
-
-        try {
-            this.reviewRepository.deleteById(id);
-        } catch (Exception e) {
-            throw new Exception(e);
+    public boolean addCompanyReview(Review review, Long companyId) {
+        Company company = this.companyService.getCompany(companyId);
+        if (company != null) {
+            review.setCompany(company);
+            reviewRepository.save(review);
+            return true;
+        } else {
+            return false;
         }
     }
 
+    public Review getReviewById(Long companyId, Long reviewId) {
+        List<Review> reviews = this.getAllReviews(companyId);
+
+        Review review = reviews.stream().filter(r -> r.getId() == (reviewId)).findFirst().orElse(null);
+        return review;
+    }
+
+    public boolean updateReview(Long companyId, Long id, Review review) {
+
+        Company company = this.companyService.getCompany(companyId);
+        if (company == null) {
+            return false;
+        }
+
+        List<Review> reviews = this.getAllReviews(companyId);
+
+        Review reviewid = reviews.stream()
+                .filter(r -> Objects.equals(r.getId(), id))
+                .findFirst()
+                .orElse(null);
+
+        if (reviewid == null) {
+            return false;
+        }
+
+        // Do NOT change company unless intentionally required
+        reviewid.setDesc(review.getDesc());
+        reviewid.setRating(review.getRating());
+        reviewid.setTitle(review.getTitle());
+
+        this.reviewRepository.save(reviewid);
+
+        return true;
+    }
+
+    public boolean deleteReview(Long companyId, Long reviewId) {
+
+        Company company = this.companyService.getCompany(companyId);
+        if (company == null) {
+            return false;
+        }
+
+        if (!reviewRepository.existsById(reviewId)) {
+            return false;
+        }
+
+        reviewRepository.deleteById(reviewId);
+        return true;
+    }
 
 }

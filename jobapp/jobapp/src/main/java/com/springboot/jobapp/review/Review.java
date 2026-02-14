@@ -1,4 +1,4 @@
-package com.springboot.jobapp.review;
+ package com.springboot.jobapp.review;
 
 import com.springboot.jobapp.company.Company;
 
@@ -10,14 +10,20 @@ import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Review {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String review;
-    private Integer rating;
+    private String title;
+    private String desc;
+    private Double rating;
+
 
     @ManyToOne
-    private Company company;
+    Company company;
+
+    public Review() {
+    }
 
     public Long getId() {
         return id;
@@ -27,23 +33,28 @@ public class Review {
         this.id = id;
     }
 
-    public String getReview() {
-        return review;
+    public String getTitle() {
+        return title;
     }
 
-    public void setReview(String review) {
-        this.review = review;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public Integer getRating() {
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
+    public Double getRating() {
         return rating;
     }
 
-    public void setRating(Integer rating) {
+    public void setRating(Double rating) {
         this.rating = rating;
-    }
-
-    public Review() {
     }
 
     public Company getCompany() {
@@ -54,11 +65,21 @@ public class Review {
         this.company = company;
     }
 
-    public Review(Long id, String review, Integer rating, Company company) {
+    @Override
+    public String toString() {
+        return "Review [id=" + id + ", title=" + title + ", desc=" + desc + ", rating=" + rating + ", company="
+                + company + "]";
+    }
+
+    public Review(Long id, String title, String desc, Double rating, Company company) {
         this.id = id;
-        this.review = review;
+        this.title = title;
+        this.desc = desc;
         this.rating = rating;
         this.company = company;
     }
 
+    
+    
+    
 }
